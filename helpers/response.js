@@ -1,11 +1,11 @@
 exports.success = function (payload, message, res) {
-	const datas = {
+	const data = {
 		success: true,
 		statusCode: res.statusCode,
 		message,
 		payload,
 	};
-	res.json(datas);
+	res.json(data);
 	res.end();
 };
 

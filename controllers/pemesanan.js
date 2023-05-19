@@ -73,6 +73,11 @@ exports.getPemesanan = async (IdPengguna) => {
 	}
 };
 
+exports.getPengunjungHariIni = async (hariIni) => {
+    const query = await db.query(`SELECT SUM(dp.Qty) as pengunjungHariIni from detail_pemesanan as dp INNER JOIN pemesanan as p on dp.IdPemesanan = p.IdPemesanan where p.TanggalMasuk = '${hariIni}' AND p.Status= 'Berhasil'`)
+    return query
+};
+
 exports.postPemesanan = async (pemesanan, detail) => {
 	const query = await db.query("INSERT INTO pemesanan SET ?", [pemesanan])
 	

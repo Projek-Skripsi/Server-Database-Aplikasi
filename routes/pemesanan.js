@@ -2,7 +2,7 @@ const express = require("express");
 const response = require("../helpers/response");
 const pemesanan = express.Router();
 
-const { getAllPemesanan, getPemesanan, postPemesanan, putPemesanan } = require("../controllers/pemesanan");
+const { getAllPemesanan, getPemesanan, getPengunjungHariIni, postPemesanan, putPemesanan } = require("../controllers/pemesanan");
 
 pemesanan.route("/").get(async (req, res) => {
     try {
@@ -18,6 +18,16 @@ pemesanan.route("/user/:IdPengguna").get(async (req, res) => {
         const IdPengguna = req.params.IdPengguna
         const result = await getPemesanan(IdPengguna);
         response.success(result, "mengambil data pemesanan berdasarkan Id pengguna", res)
+    } catch(err) {
+        response.error({ error: err.message }, req.originalUrl, 403, res)
+    }
+});
+
+pemesanan.route("/totalPengunjung/:tanggal").get(async (req, res) => {
+    try {
+        const tanggal = req.params.tanggal
+        const result = await getPengunjungHariIni(tanggal);
+        response.success(result, "mengambil data jumlah pengunjung hari ini", res)
     } catch(err) {
         response.error({ error: err.message }, req.originalUrl, 403, res)
     }

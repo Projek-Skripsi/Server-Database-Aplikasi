@@ -1,7 +1,7 @@
 const db = require("../configs/database");
 
 exports.getAllRating = async () => {
-    const query = await db.query("SELECT * from rating")
+    const query = await db.query("SELECT r.IdRating, r.TanggalUpload, r.Ulasan, r.Bintang, p.UrlGambar, p.Nama FROM rating as r INNER JOIN pengguna as p on r.IdPengguna = p.IdPengguna ORDER BY r.TanggalUpload DESC")
     return query
 };
 

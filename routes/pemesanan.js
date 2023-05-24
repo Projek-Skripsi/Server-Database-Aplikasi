@@ -2,7 +2,7 @@ const express = require("express");
 const response = require("../helpers/response");
 const pemesanan = express.Router();
 
-const { getAllPemesanan, getPemesanan, getPengunjungHariIni, postPemesanan, putPemesanan } = require("../controllers/pemesanan");
+const { getAllPemesanan, getPemesananByIdPemesanan, getPemesananByIdPengguna, getPengunjungHariIni, postPemesanan, putPemesanan } = require("../controllers/pemesanan");
 
 pemesanan.route("/").get(async (req, res) => {
     try {
@@ -13,11 +13,21 @@ pemesanan.route("/").get(async (req, res) => {
     }
 });
 
+pemesanan.route("/:IdPemesanan").get(async (req, res) => {
+    try {
+        const IdPemesanan = req.params.IdPemesanan
+        const result = await getPemesananByIdPemesanan(IdPemesanan);
+        response.success(result, "mengambil data pemesanan berdasarkan id pemesanan", res)
+    } catch(err) {
+        response.error({ error: err.message }, req.originalUrl, 403, res)
+    }
+});
+
 pemesanan.route("/user/:IdPengguna").get(async (req, res) => {
     try {
         const IdPengguna = req.params.IdPengguna
-        const result = await getPemesanan(IdPengguna);
-        response.success(result, "mengambil data pemesanan berdasarkan Id pengguna", res)
+        const result = await getPemesananByIdPengguna(IdPengguna);
+        response.success(result, "mengambil data pemesanan berdasarkan id pengguna", res)
     } catch(err) {
         response.error({ error: err.message }, req.originalUrl, 403, res)
     }
@@ -34,10 +44,10 @@ pemesanan.route("/totalPengunjung/:tanggal").get(async (req, res) => {
 });
 
 pemesanan.route("/").post(async (req, res) => {
-    const { IdPengguna, TanggalMasuk, TanggalPemesanan, IdPembayaran, Total, Status, detail} = req.body
+    const { IdPemesanan, IdPengguna, TanggalMasuk, TanggalPemesanan, IdPembayaran, Total, Status, detail} = req.body
 
     const pemesanan = {
-        IdPemesanan: 1, IdPengguna, TanggalMasuk, TanggalPemesanan, IdPembayaran, Total, Status
+        IdPemesanan, IdPengguna, TanggalMasuk, TanggalPemesanan, IdPembayaran, Total, Status
     }
 
     try {

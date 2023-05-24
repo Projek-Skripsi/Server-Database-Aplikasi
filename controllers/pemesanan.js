@@ -1,7 +1,7 @@
 const db = require("../configs/database");
 
 exports.getAllPemesanan = async () => {
-	const query = await db.query("SELECT p.IdPemesanan, p.IdPengguna, p.TanggalMasuk, mp.NamaPembayaran, mp.NoRekening, mp.An, p.TanggalPemesanan, p.Total, p.Status, kk.NamaKategori, dp.Harga, dp.Qty FROM pemesanan AS p INNER JOIN detail_pemesanan AS dp ON p.IdPemesanan = dp.IdPemesanan INNER JOIN metode_pembayaran as mp ON p.IdPembayaran = mp.IdPembayaran LEFT JOIN kategori_kolam AS kk ON kk.IdKategori = dp.IdKategori")
+	const query = await db.query("SELECT p.IdPemesanan, p.IdPengguna, p.TanggalMasuk, mp.NamaPembayaran, mp.NoRekening, mp.An, p.TanggalPemesanan, p.Total, p.Status, kk.NamaKategori, dp.Harga, dp.Qty FROM pemesanan AS p INNER JOIN detail_pemesanan AS dp ON p.IdPemesanan = dp.IdPemesanan INNER JOIN metode_pembayaran as mp ON p.IdPembayaran = mp.IdPembayaran LEFT JOIN kategori_kolam AS kk ON kk.IdKategori = dp.IdKategori ORDER BY p.TanggalPemesanan DESC")
 
 	if (!query.error) {
 		let listPemesanan = [], listDetail = [], lastPush = "";
@@ -37,8 +37,8 @@ exports.getAllPemesanan = async () => {
 	}
 };
 
-exports.getPemesanan = async (IdPengguna) => {
-	const query = await db.query(`SELECT p.IdPemesanan, p.TanggalMasuk, mp.NamaPembayaran, mp.NoRekening, mp.An, p.TanggalPemesanan, p.Total, p.Status, kk.NamaKategori, dp.Harga, dp.Qty FROM pemesanan AS p INNER JOIN detail_pemesanan AS dp ON p.IdPemesanan = dp.IdPemesanan INNER JOIN metode_pembayaran as mp ON p.IdPembayaran = mp.IdPembayaran LEFT JOIN kategori_kolam AS kk ON kk.IdKategori = dp.IdKategori WHERE p.IdPengguna='${IdPengguna}'`)
+exports.getPemesananByIdPemesanan = async (IdPemesanan) => {
+	const query = await db.query(`SELECT p.IdPemesanan, p.TanggalMasuk, mp.NamaPembayaran, mp.NoRekening, mp.An, p.TanggalPemesanan, p.Total, p.Status, kk.NamaKategori, dp.Harga, dp.Qty FROM pemesanan AS p INNER JOIN detail_pemesanan AS dp ON p.IdPemesanan = dp.IdPemesanan INNER JOIN metode_pembayaran as mp ON p.IdPembayaran = mp.IdPembayaran LEFT JOIN kategori_kolam AS kk ON kk.IdKategori = dp.IdKategori WHERE p.IdPemesanan='${IdPemesanan}' ORDER BY p.TanggalPemesanan DESC`)
 
 	if (!query.error) {
 		let listPemesanan = [], listDetail = [], lastPush = "";
@@ -63,6 +63,43 @@ exports.getPemesanan = async (IdPengguna) => {
 					TanggalPemesanan: query[index].TanggalPemesanan,
 					Total: query[index].Total,
 					Status: query[index].Status,
+					detail: listDetail,
+				});
+                listDetail = []
+				lastPush = query[index].IdPemesanan;
+			}
+		}
+        return { pemesanan : listPemesanan }
+	}
+};
+
+exports.getPemesananByIdPengguna = async (IdPengguna) => {
+	const query = await db.query(`SELECT p.IdPemesanan, p.TanggalMasuk, mp.NamaPembayaran, mp.NoRekening, mp.An, p.TanggalPemesanan, p.Total, p.Status, kk.NamaKategori, dp.Harga, dp.Qty, (SELECT IdRating from rating where IdPemesanan=p.IdPemesanan) as IdRating FROM pemesanan AS p INNER JOIN detail_pemesanan AS dp ON p.IdPemesanan = dp.IdPemesanan INNER JOIN metode_pembayaran as mp ON p.IdPembayaran = mp.IdPembayaran LEFT JOIN kategori_kolam AS kk ON kk.IdKategori = dp.IdKategori WHERE p.IdPengguna='${IdPengguna}' ORDER BY p.TanggalPemesanan DESC`)
+
+	if (!query.error) {
+		let listPemesanan = [], listDetail = [], lastPush = "";
+		
+		for (let index in query) {
+			if (lastPush !== query[index].IdPemesanan) {
+                for (let i in query) {
+                    if (query[i].IdPemesanan === query[index].IdPemesanan) {
+                        listDetail.push({
+                            NamaKategori: query[i].NamaKategori,
+                            Harga: query[i].Harga,
+                            Qty: query[i].Qty,
+                        });
+                    }
+                }
+				listPemesanan.push({
+                    IdPemesanan: query[index].IdPemesanan,
+					TanggalMasuk: query[index].TanggalMasuk,
+					NamaPembayaran: query[index].NamaPembayaran,
+					NoRekening: query[index].NoRekening,
+					An: query[index].An,
+					TanggalPemesanan: query[index].TanggalPemesanan,
+					Total: query[index].Total,
+					Status: query[index].Status,
+					IdRating: query[index].IdRating,
 					detail: listDetail,
 				});
                 listDetail = []

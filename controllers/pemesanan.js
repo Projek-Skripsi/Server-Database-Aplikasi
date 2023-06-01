@@ -1,7 +1,7 @@
 const db = require("../configs/database");
 
 exports.getAllPemesanan = async () => {
-	const query = await db.query("SELECT p.IdPemesanan, p.IdPengguna, p.TanggalMasuk, mp.NamaPembayaran, mp.NoRekening, mp.An, p.TanggalPemesanan, p.Total, p.Status, kk.NamaKategori, dp.Harga, dp.Qty FROM pemesanan AS p INNER JOIN detail_pemesanan AS dp ON p.IdPemesanan = dp.IdPemesanan INNER JOIN metode_pembayaran as mp ON p.IdPembayaran = mp.IdPembayaran LEFT JOIN kategori_kolam AS kk ON kk.IdKategori = dp.IdKategori ORDER BY p.TanggalPemesanan DESC")
+	const query = await db.query("SELECT p.IdPemesanan, p.IdPengguna, p.TanggalMasuk, mp.NamaPembayaran, mp.NoRekening, mp.An, p.TanggalPemesanan, p.Total, p.Status, (SELECT UrlBuktiBayar from konfirmasi_pembayaran where IdPemesanan=p.IdPemesanan) as UrlBuktiBayar, (SELECT SUM(Qty) from detail_pemesanan where IdPemesanan=p.IdPemesanan) as TotalQty, kk.NamaKategori, dp.Harga, dp.Qty FROM pemesanan AS p INNER JOIN detail_pemesanan AS dp ON p.IdPemesanan = dp.IdPemesanan INNER JOIN metode_pembayaran as mp ON p.IdPembayaran = mp.IdPembayaran LEFT JOIN kategori_kolam AS kk ON kk.IdKategori = dp.IdKategori ORDER BY p.IdPemesanan")
 
 	if (!query.error) {
 		let listPemesanan = [], listDetail = [], lastPush = "";
@@ -27,6 +27,8 @@ exports.getAllPemesanan = async () => {
 					TanggalPemesanan: query[index].TanggalPemesanan,
 					Total: query[index].Total,
 					Status: query[index].Status,
+					UrlBuktiBayar: query[index].UrlBuktiBayar,
+					TotalQty: query[index].TotalQty,
 					detail: listDetail,
 				});
                 listDetail = []
@@ -135,7 +137,7 @@ exports.putPemesanan = async (IdPemesanan, data) => {
     return query
 };
 
-
+// Add detail pemesanan, dipanggil saat post data pemesanan
 async function postDetailTransaction(detail_pemesanan) {
 	const query = await db.query("INSERT INTO detail_pemesanan(IdPemesanan,IdKategori,Harga,Qty) VALUES ?", [detail_pemesanan])
     return query

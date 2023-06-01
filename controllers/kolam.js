@@ -1,7 +1,7 @@
 const db = require("../configs/database");
 
 exports.getAllKolam = async () => {
-    const query = await db.query("SELECT * from kolam")
+    const query = await db.query("SELECT k.IdKolam, k.Judul, k.IdKategori, kk.NamaKategori, k.UrlGambar, k.Status from kolam as k INNER JOIN kategori_kolam as kk ON k.IdKategori = kk.IdKategori")
     return query
 };
 

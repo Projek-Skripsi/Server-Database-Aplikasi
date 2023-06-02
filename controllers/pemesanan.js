@@ -1,7 +1,7 @@
 const db = require("../configs/database");
 
 exports.getAllPemesanan = async () => {
-	const query = await db.query("SELECT p.IdPemesanan, p.IdPengguna, p.TanggalMasuk, mp.NamaPembayaran, mp.NoRekening, mp.An, p.TanggalPemesanan, p.Total, p.Status, (SELECT UrlBuktiBayar from konfirmasi_pembayaran where IdPemesanan=p.IdPemesanan) as UrlBuktiBayar, (SELECT SUM(Qty) from detail_pemesanan where IdPemesanan=p.IdPemesanan) as TotalQty, kk.NamaKategori, dp.Harga, dp.Qty FROM pemesanan AS p INNER JOIN detail_pemesanan AS dp ON p.IdPemesanan = dp.IdPemesanan INNER JOIN metode_pembayaran as mp ON p.IdPembayaran = mp.IdPembayaran LEFT JOIN kategori_kolam AS kk ON kk.IdKategori = dp.IdKategori ORDER BY p.IdPemesanan")
+	const query = await db.query("SELECT p.IdPemesanan, p.IdPengguna, p.TanggalMasuk, mp.NamaPembayaran, mp.NoRekening, mp.An, p.TanggalPemesanan, p.Total, p.Status, (SELECT UrlBuktiBayar from konfirmasi_pembayaran where IdPemesanan=p.IdPemesanan) as UrlBuktiBayar, (SELECT SUM(Qty) from detail_pemesanan where IdPemesanan=p.IdPemesanan) as TotalQty, kk.NamaKategori, dp.Harga, dp.Qty FROM pemesanan AS p INNER JOIN detail_pemesanan AS dp ON p.IdPemesanan = dp.IdPemesanan INNER JOIN metode_pembayaran as mp ON p.IdPembayaran = mp.IdPembayaran LEFT JOIN kategori_kolam AS kk ON kk.IdKategori = dp.IdKategori ORDER BY p.IdPemesanan DESC")
 
 	if (!query.error) {
 		let listPemesanan = [], listDetail = [], lastPush = "";

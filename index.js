@@ -7,11 +7,12 @@ const carousel = require("./routes/carousel");
 const kategori = require('./routes/kategori_kolam');
 const kolam = require('./routes/kolam');
 const konfirmasi = require('./routes/konfirmasi_pembayaran');
-const pembayaran = require('./routes/metode_pembayara');
+const pembayaran = require('./routes/metode_pembayaran');
 const pengguna = require('./routes/pengguna');
 const perusahaan = require('./routes/perusahaan');
 const rating = require('./routes/rating');
 const pemesanan = require("./routes/pemesanan");
+const laporan = require("./routes/laporan")
 
 const app = express();
 const PORT = 3000;
@@ -34,6 +35,7 @@ app.use("/pengguna", pengguna);
 app.use("/perusahaan", perusahaan);
 app.use("/rating", rating);
 app.use("/pemesanan", pemesanan);
+app.use("/laporan", laporan);
 
 app.listen(PORT, () => {
 	console.log(`Server Berjalan di http://localhost:${PORT}`);

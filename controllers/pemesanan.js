@@ -113,7 +113,7 @@ exports.getPemesananByIdPengguna = async (IdPengguna) => {
 };
 
 exports.getPengunjungHariIni = async (hariIni) => {
-    const query = await db.query(`SELECT SUM(dp.Qty) as pengunjungHariIni from detail_pemesanan as dp INNER JOIN pemesanan as p on dp.IdPemesanan = p.IdPemesanan where p.TanggalMasuk = '${hariIni}' AND p.Status= 'Berhasil' OR p.Status= 'Selesai'`)
+    const query = await db.query(`SELECT SUM(dp.Qty) as pengunjungHariIni from detail_pemesanan as dp INNER JOIN pemesanan as p on dp.IdPemesanan = p.IdPemesanan where p.TanggalMasuk = '${hariIni}' AND (p.Status= 'Berhasil' OR p.Status= 'Selesai')`)
     return query
 };
 
